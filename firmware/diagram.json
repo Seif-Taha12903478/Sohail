@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "author": "Seif & Abijith",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-photoresistor", "id": "ldr", "top": -100, "left": 200, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot", "top": -100, "left": 100, "attrs": {} }
+  ],
+  "connections": [
+    [ "ldr:VCC", "uno:5V", "red", [ "v0" ] ],
+    [ "ldr:GND", "uno:GND", "black", [ "v0" ] ],
+    [ "ldr:OUT", "uno:A0", "green", [ "v0" ] ],
+    [ "pot:VCC", "uno:5V", "red", [ "v0" ] ],
+    [ "pot:GND", "uno:GND", "black", [ "v0" ] ],
+    [ "pot:OUT", "uno:A1", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "author": "Seif & Abijith",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-v1", "id": "esp32", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-photoresistor", "id": "ldr", "top": -100, "left": 200, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot", "top": -100, "left": 100, "attrs": {} }
+  ],
+  "connections": [
+    [ "ldr:VCC", "esp32:3V3", "red", [ "v0" ] ],
+    [ "ldr:GND", "esp32:GND", "black", [ "v0" ] ],
+    [ "ldr:OUT", "esp32:GPIO34", "green", [ "v0" ] ],
+    [ "pot:VCC", "esp32:3V3", "red", [ "v0" ] ],
+    [ "pot:GND", "esp32:GND", "black", [ "v0" ] ],
+    [ "pot:OUT", "esp32:GPIO35", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
