@@ -1,12 +1,13 @@
 {
   "name": "iot-ingestion-api",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "MQTT subscriber + REST API + alert engine for IoT telemetry platform",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "test": "node --test src/test/"
   },
   "dependencies": {
     "express": "^4.18.2",
