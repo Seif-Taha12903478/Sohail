@@ -1,6 +1,6 @@
 # PROTOCOL — IoT Environmental Monitoring Platform
 
-This document defines all communication contracts across the platform: UART telemetry frames, MQTT topics/payloads, REST API endpoints, alert rules, and the auth scheme.
+This document defines all communication contracts across the platform: UART telemetry frames, MQTT topics/payloads, REST API endpoints, alert rules, auth scheme, and the alert lifecycle.
 
 ---
 
@@ -74,7 +74,7 @@ This document defines all communication contracts across the platform: UART tele
 
 ---
 
-## Week 6 — REST API Contract
+## Week 6–8 — REST API Contract
 
 ### Base URL
 `http://localhost:3001` (local) or deployed URL (production)
@@ -86,91 +86,204 @@ Authorization: Bearer <token>
 ```
 Default demo token: `iot-platform-demo-token` (override via `API_TOKEN` env var).
 
-Returns `401 Unauthorized` if missing or invalid.
+Returns `401 Unauthorized` if missing or invalid:
+```json
+{ "error": "Missing or invalid Authorization header. Expected: Bearer <token>" }
+```
+
+### Rate Limiting
+- **Limit:** 100 requests per 60 seconds per IP address
+- **Exceeded:** Returns `429 Too Many Requests`
+```json
+{ "error": "Rate limit exceeded. Try again in a minute." }
+```
+
+### Input Validation
+All POST/PATCH endpoints validate input. Invalid input returns `400 Bad Request`:
+```json
+{ "error": "Validation failed", "details": ["device_id must be a non-empty alphanumeric string (max 100 chars)", "field must be one of: temp, light, mode"] }
+```
 
 ### Endpoints
+
+#### `GET /health`
+Public health check (no auth required).
+```json
+{ "status": "ok", "mqtt": "connected" }
+```
 
 #### `GET /devices`
 Returns list of known devices.
 ```json
 [
-  { "device_id": "esp32-001", "name": "esp32-001", "location": "Wokwi Simulation", "created_at": "..." }
+  { "device_id": "esp32-001", "name": "esp32-001", "location": "Wokwi Simulation", "created_at": "2026-07-22T11:13:13Z" }
 ]
 ```
 
-#### `GET /readings?device=<id>&from=<ts>&to=<ts>`
+#### `GET /readings?device=<id>&from=<ISO>&to=<ISO>`
 Returns historical readings for a device within an optional time range.
-- `device` — **required** device_id
-- `from` — ISO timestamp (optional)
-- `to` — ISO timestamp (optional)
+- `device` — **required** device_id (alphanumeric, max 100 chars)
+- `from` — ISO 8601 timestamp (optional)
+- `to` — ISO 8601 timestamp (optional)
 - Returns max 1000 rows, newest first
 
 ```json
 [
-  { "id": "uuid", "device_id": "esp32-001", "temp": 24.5, "light": 380, "mode": 1, "ts": "2024-..." }
+  { "id": "uuid", "device_id": "esp32-001", "temp": 24.5, "light": 380, "mode": 1, "ts": "2026-07-22T11:13:13Z" }
 ]
 ```
 
-#### `GET /alerts?device=<id>&from=<ts>&to=<ts>`
-Returns alert records, optionally filtered by device and time range.
+#### `GET /alerts?device=<id>&from=<ISO>&to=<ISO>&status=<status>&severity=<severity>`
+Returns alert records, optionally filtered by device, time range, status, and severity.
+- `status` — `active`, `acknowledged`, or `resolved` (optional)
+- `severity` — `info`, `warning`, or `critical` (optional)
+- Returns max 200 rows, newest first
+
 ```json
 [
   {
-    "id": "uuid", "device_id": "esp32-001", "field": "temp", "operator": ">",
-    "value": 35, "severity": "critical", "message": "temp > 35 (current: 38.2)",
-    "ts": "2024-...", "resolved": false
+    "id": "uuid",
+    "device_id": "esp32-001",
+    "field": "temp",
+    "operator": ">",
+    "value": 30,
+    "severity": "critical",
+    "message": "temp > 30 (current: 31.4)",
+    "ts": "2026-07-22T10:28:13Z",
+    "resolved": false,
+    "status": "active",
+    "acknowledged_at": null,
+    "resolved_at": null,
+    "acknowledged_by": null
   }
 ]
 ```
 
+#### `PATCH /alerts/:id/ack`
+Acknowledges an active alert. Transitions status from `active` → `acknowledged`.
+- Only works on alerts with `status = 'active'`
+- Returns `404` if alert not found or not in active state
+
+```json
+{
+  "id": "uuid",
+  "status": "acknowledged",
+  "acknowledged_at": "2026-07-22T11:30:00Z",
+  "resolved": false
+}
+```
+
+#### `PATCH /alerts/:id/resolve`
+Resolves an active or acknowledged alert. Transitions status to `resolved`.
+- Works on alerts with `status = 'active'` or `status = 'acknowledged'`
+- Returns `404` if alert not found or already resolved
+
+```json
+{
+  "id": "uuid",
+  "status": "resolved",
+  "resolved_at": "2026-07-22T11:35:00Z",
+  "resolved": true
+}
+```
+
 #### `GET /thresholds?device=<id>`
-Returns configured alert thresholds.
+Returns configured alert thresholds for a device (or all if no device specified).
+
+```json
+[
+  {
+    "id": "uuid",
+    "device_id": "esp32-001",
+    "field": "temp",
+    "operator": ">",
+    "value": 30,
+    "severity": "critical",
+    "enabled": true,
+    "created_at": "2026-07-22T11:13:13Z"
+  }
+]
+```
 
 #### `POST /thresholds`
-Create a new alert threshold.
+Create a new alert threshold. Validates: device_id (alphanumeric), field (temp/light/mode), operator (> < >= <= ==), value (number), severity (info/warning/critical).
+
+**Request:**
 ```json
 { "device_id": "esp32-001", "field": "temp", "operator": ">", "value": 35, "severity": "critical" }
 ```
 
+**Response (201 Created):**
+```json
+{ "id": "uuid", "device_id": "esp32-001", "field": "temp", "operator": ">", "value": 35, "severity": "critical", "enabled": true, "created_at": "2026-07-22T11:20:00Z" }
+```
+
 #### `DELETE /thresholds/:id`
-Delete a threshold.
+Delete a threshold. Returns `204 No Content` on success.
+
+#### `GET /stats?device=<id>`
+Returns aggregated statistics for a device over the last 24 hours.
+```json
+{
+  "count": 240,
+  "avgTemp": 27.3,
+  "maxTemp": 35.7,
+  "minTemp": 22.1,
+  "avgLight": 420.5,
+  "maxLight": 548,
+  "minLight": 361
+}
+```
 
 #### `POST /command`
-Publish a command to the device via MQTT.
+Publish a command to the device via MQTT. Validates: cmd (MODE or RATE), value (number).
+- MODE: value must be 1, 2, or 3
+- RATE: value must be between 100 and 60000
+
+**Request:**
 ```json
 { "cmd": "MODE", "value": 2 }
 ```
 
-#### `GET /health`
-Public health check (no auth required).
-
-### Stored Record Shape
-| Field       | Type         | Description                          |
-|-------------|--------------|--------------------------------------|
-| `id`        | uuid         | Primary key                          |
-| `device_id` | text (FK)    | References devices table             |
-| `temp`      | real         | Temperature in °C                   |
-| `light`     | integer      | Light level 0–1000                   |
-| `mode`      | integer      | Sampling mode 1–3                    |
-| `ts`        | timestamptz  | Timestamp of reading                 |
+**Response:**
+```json
+{ "status": "sent", "payload": "{\"cmd\":\"MODE\",\"value\":2}" }
+```
 
 ---
 
-## Week 7 — Alerting & Security Contract
+## Alert Lifecycle
 
-### Auth Scheme
-- **Type:** Bearer token (API key)
-- **Header:** `Authorization: Bearer <token>`
-- **Storage:** Environment variable `API_TOKEN`, never committed
-- **Behavior:** Missing/invalid token → `401 Unauthorized`
+### States
+| Status          | Description                              | Color   |
+|-----------------|------------------------------------------|---------|
+| `active`        | Alert fired, needs attention             | red     |
+| `acknowledged`  | Someone saw it, working on it            | amber   |
+| `resolved`      | Issue fixed, alert cleared               | green   |
 
-### Alert Threshold Config Shape
-```json
-{
-  "device_id": "esp32-001", "field": "temp", "operator": ">",
-  "value": 35, "severity": "critical", "enabled": true
-}
+### State Transitions
 ```
+active ──── (PATCH /alerts/:id/ack) ────→ acknowledged
+active ──── (PATCH /alerts/:id/resolve) ─→ resolved
+acknowledged ── (PATCH /alerts/:id/resolve) ──→ resolved
+```
+
+### Database Columns
+| Field              | Type         | Description                              |
+|--------------------|--------------|------------------------------------------|
+| `id`               | uuid (PK)    | Primary key                              |
+| `device_id`        | text (FK)    | Device that triggered the alert          |
+| `field`            | text         | Which field breached (temp/light)        |
+| `operator`         | text         | Comparison operator                      |
+| `value`            | real         | Threshold value                          |
+| `severity`         | text         | info / warning / critical                |
+| `message`          | text         | Human-readable description               |
+| `ts`               | timestamptz  | When alert was raised                    |
+| `resolved`         | boolean      | Deprecated — use `status` instead         |
+| `status`           | text         | active / acknowledged / resolved          |
+| `acknowledged_at`  | timestamptz  | When alert was acknowledged              |
+| `resolved_at`      | timestamptz  | When alert was resolved                  |
+| `acknowledged_by`  | text         | Who acknowledged the alert              |
 
 ### Severity Levels
 | Severity   | Color    | Use Case                              |
@@ -184,15 +297,20 @@ Public health check (no auth required).
 - Cooldown tracked per `device_id:field:operator:value` key
 - When value returns to normal, cooldown is cleared
 
-### Alert Record Shape
-| Field       | Type         | Description                          |
-|-------------|--------------|--------------------------------------|
-| `id`        | uuid         | Primary key                          |
-| `device_id` | text (FK)    | Device that triggered the alert      |
-| `field`     | text         | Which field breached (temp/light)    |
-| `operator`  | text         | Comparison operator                  |
-| `value`     | real         | Threshold value                      |
-| `severity`  | text         | info / warning / critical            |
-| `message`   | text         | Human-readable description            |
-| `ts`        | timestamptz  | When alert was raised                |
-| `resolved`  | boolean      | Whether the alert has been resolved  |
+---
+
+## Error Responses
+
+All errors return structured JSON with an `error` field and optional `details` array:
+
+| Status | Condition                                  |
+|--------|--------------------------------------------|
+| 400    | Invalid input (validation failed)          |
+| 401    | Missing or invalid Bearer token             |
+| 404    | Endpoint not found / alert not found       |
+| 429    | Rate limit exceeded                        |
+| 500    | Database or internal server error           |
+
+```json
+{ "error": "Validation failed", "details": ["field must be one of: temp, light, mode"] }
+```

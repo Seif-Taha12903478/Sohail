@@ -99,17 +99,55 @@ This document records the integration milestones, test cases, and conflict resol
 
 ---
 
-## Week 8 — Capstone Deployment
+## Week 8 — Capstone: Modularization, Testing & Documentation
 
 ### Integration Date: Thursday, Week 8
 
-### Deployment Targets
-| Component     | Platform         | Status |
-|---------------|------------------|--------|
-| Dashboard     | Vercel/Netlify   | Deployed |
-| Ingestion API | Render/Railway   | Deployed |
-| ESP32 Device  | Wokwi (online)   | Running |
-| Database      | Supabase         | Provisioned |
+### Database Migration: Alert Lifecycle
+Added `status`, `acknowledged_at`, `resolved_at`, `acknowledged_by` columns to the `alerts` table. Migrated existing rows from the boolean `resolved` column to the new `status` column. Added CHECK constraint for valid status values and an index on `status`.
+
+### New API Endpoints
+| # | Test | Steps | Expected | Result |
+|---|------|-------|----------|--------|
+| 1 | Acknowledge alert | `PATCH /alerts/:id/ack` | Status changes to `acknowledged`, `acknowledged_at` set | PASS |
+| 2 | Resolve alert | `PATCH /alerts/:id/resolve` | Status changes to `resolved`, `resolved_at` set | PASS |
+| 3 | Resolve already-resolved | `PATCH /alerts/:id/resolve` on resolved alert | Returns 404 | PASS |
+| 4 | Stats endpoint | `GET /stats?device=esp32-001` | Returns avg/max/min temp and light, count | PASS |
+| 5 | Rate limiting | Send 101+ requests in 60s | 429 Too Many Requests after 100 | PASS |
+| 6 | Input validation | `POST /thresholds` with invalid field | Returns 400 with details array | PASS |
+| 7 | 404 handler | `GET /nonexistent` | Returns 404 with error message | PASS |
+
+### Automated Test Suite
+| # | Test Suite | Framework | Tests | Result |
+|---|------------|-----------|-------|--------|
+| 1 | stats.test.js (computeStats, movingAverage, exportToCsv) | Vitest | 9 | PASS |
+| 2 | api.test.js (apiGet, apiPost, apiPatch, apiDelete, ApiError) | Vitest | 7 | PASS |
+| 3 | config.test.js (config, TIME_RANGES, MODE_NAMES, formatters) | Vitest | 7 | PASS |
+| 4 | validation.test.js (validateDeviceId, validateThresholdInput) | Node.js | 11 | PASS |
+| 5 | validation.test.js (alert lifecycle, rate limiter, command validation) | Node.js | 4 | PASS |
+| | **Total** | | **38** | **ALL PASS** |
+
+### Frontend Modularization
+Verified that the refactored modular structure works end-to-end:
+- `config.js` — centralized config, no hardcoded URLs
+- `hooks/useMqtt.js` — MQTT connection and message handling
+- `hooks/useApiData.js` — API data fetching with retry support
+- `lib/api.js` — API client with Bearer auth and error handling
+- `lib/stats.js` — stats computations, moving average, CSV export
+- `components/LoginScreen.jsx` — token login
+- `components/LiveView.jsx` — live telemetry, metric cards, device control, stats panel
+- `components/HistoryView.jsx` — charts with moving average, min/max markers, CSV export
+- `components/AlertsView.jsx` — alert panel with ack/resolve + filtering
+
+### Screenshot Evidence
+| Screenshot | Verified Feature |
+|------------|----------------|
+| `screenshots/01-login.png` | Token-based login screen |
+| `screenshots/02-live-view.png` | Live telemetry, metric cards, device control, log |
+| `screenshots/03-history-charts.png` | Historical temp/light charts with real data |
+| `screenshots/04-alerts.png` | Alerts panel with severity + status badges |
+| `screenshots/05-api-database-proof.png` | All API endpoints with real database rows |
+| `screenshots/06-test-results.png` | 38/38 automated tests passing |
 
 ### Final End-to-End Test
 1. Open Wokwi ESP32 simulation → device connects to Wi-Fi + MQTT
@@ -117,8 +155,13 @@ This document records the integration milestones, test cases, and conflict resol
 3. Historical charts populate from API
 4. Send MODE=2 from dashboard → device speeds up → telemetry reflects change
 5. Raise temp above threshold → alert appears on dashboard with severity
-6. API request without token → 401 rejected
-7. API request with token → data returned successfully
-8. Data persists across device restart
+6. Acknowledge alert via dashboard → status changes to `acknowledged`
+7. Resolve alert via dashboard → status changes to `resolved`
+8. Export historical readings as CSV
+9. API request without token → 401 rejected
+10. API request with token → data returned successfully
+11. Data persists across device restart
+12. Run `npm test` in dashboard → 23/23 pass
+13. Run `npm test` in ingestion-api → 15/15 pass
 
 Result: **ALL TESTS PASSED**
