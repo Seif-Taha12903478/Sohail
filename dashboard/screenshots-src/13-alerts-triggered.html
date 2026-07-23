@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0f172a;--bg-secondary:#1e293b;--border:#334155;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;--accent:#06b6d4;--warning:#f59e0b;--success:#10b981;--critical:#dc2626;--info:#3b82f6;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh}
+.app{max-width:1400px;margin:0 auto;padding:24px}
+.header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--border);margin-bottom:32px}
+.header h1{font-size:1.75rem;font-weight:700}.header h1 span{color:var(--accent)}
+.connection-badge{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;font-size:0.8125rem;font-weight:500;background:var(--bg-secondary);border:1px solid var(--border)}
+.connection-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+.tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.tab{padding:12px 24px;background:none;border:none;color:var(--text-secondary);font-size:0.9375rem;font-weight:500;border-bottom:2px solid transparent;font-family:inherit}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.3);margin-bottom:20px}
+.card h2{font-size:1.125rem;font-weight:600;margin-bottom:16px}
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);font-size:0.8125rem;font-family:inherit}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+.filter-btn.critical{border-color:var(--critical);color:var(--critical)}.filter-btn.critical.active{background:var(--critical);color:white}
+.filter-btn.warning{border-color:var(--warning);color:var(--warning)}.filter-btn.warning.active{background:var(--warning);color:#1e293b}
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:8px;margin-bottom:8px;border:1px solid var(--border);background:var(--bg-secondary)}
+.alert-item.critical{border-left:4px solid var(--critical);background:rgba(220,38,38,0.08)}
+.alert-item.warning{border-left:4px solid var(--warning);background:rgba(245,158,11,0.08)}
+.alert-item.resolved{opacity:0.5}
+.alert-severity{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:3px 10px;border-radius:4px;white-space:nowrap}
+.alert-severity.critical{background:rgba(220,38,38,0.2);color:#fca5a5}
+.alert-severity.warning{background:rgba(245,158,11,0.2);color:#fcd34d}
+.alert-status{font-size:0.7rem;font-weight:600;text-transform:uppercase;padding:2px 8px;border-radius:4px}
+.alert-status.active{background:rgba(220,38,38,0.15);color:#fca5a5}
+.alert-status.resolved{background:rgba(16,185,129,0.15);color:#6ee7b7}
+.alert-content{flex:1}.alert-device{font-weight:600;font-size:0.9375rem;margin-bottom:4px}
+.alert-message{font-size:0.875rem;color:var(--text-secondary)}
+.alert-time{font-size:0.75rem;color:var(--text-muted);white-space:nowrap}
+.alert-actions{display:flex;gap:8px;margin-top:8px}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);font-size:0.8rem;font-weight:500;font-family:inherit}
+.btn.ack{border-color:var(--warning);color:var(--warning)}.btn.resolve{border-color:var(--success);color:var(--success)}
+</style></head><body>
+<div class="app">
+  <div class="header"><div><h1>IoT <span>Environmental Monitoring</span></h1><div style="font-size:0.875rem;color:var(--text-muted);margin-top:4px">Alerts — Active & History</div></div><div class="connection-badge"><div class="connection-dot"></div>Live</div></div>
+  <div class="tabs"><button class="tab">Live View</button><button class="tab">History and Charts</button><button class="tab active">Alerts (3)</button></div>
+  <div class="card">
+    <h2>Active Alerts (3)</h2>
+    <div class="filter-bar">
+      <button class="filter-btn active">All</button><button class="filter-btn critical active">Critical (2)</button><button class="filter-btn warning">Warning (1)</button><button class="filter-btn">Info (0)</button>
+      <span style="flex:1"></span><button class="filter-btn active">Active</button><button class="filter-btn">Acknowledged</button><button class="filter-btn">Resolved</button>
+    </div>
+    <div class="alert-item critical"><span class="alert-severity critical">CRITICAL</span><span class="alert-status active">Active</span><div class="alert-content"><div class="alert-device">esp32-001</div><div class="alert-message">temp > 30 (current: 35.7°C) — Temperature exceeded critical threshold</div><div class="alert-actions"><button class="btn ack">Acknowledge</button><button class="btn resolve">Resolve</button></div></div><span class="alert-time">Jul 22, 11:10</span></div>
+    <div class="alert-item critical"><span class="alert-severity critical">CRITICAL</span><span class="alert-status active">Active</span><div class="alert-content"><div class="alert-device">esp32-002</div><div class="alert-message">temp > 28 (current: 29.8°C) — Temperature exceeded critical threshold</div><div class="alert-actions"><button class="btn ack">Acknowledge</button><button class="btn resolve">Resolve</button></div></div><span class="alert-time">Jul 22, 10:43</span></div>
+    <div class="alert-item warning"><span class="alert-severity warning">WARNING</span><span class="alert-status active">Active</span><div class="alert-content"><div class="alert-device">esp32-001</div><div class="alert-message">light < 200 (current: 185 lx) — Light dropped below warning threshold</div><div class="alert-actions"><button class="btn ack">Acknowledge</button><button class="btn resolve">Resolve</button></div></div><span class="alert-time">Jul 22, 09:58</span></div>
+  </div>
+  <div class="card">
+    <h2>Alert History</h2>
+    <div class="alert-item warning resolved"><span class="alert-severity warning">WARNING</span><span class="alert-status resolved">Resolved</span><div class="alert-content"><div class="alert-device">esp32-001</div><div class="alert-message">temp > 28 (current: 29.2°C) — Resolved after temperature returned to normal</div></div><span class="alert-time">Jul 22, 10:13</span></div>
+    <div class="alert-item critical resolved"><span class="alert-severity critical">CRITICAL</span><span class="alert-status resolved">Resolved</span><div class="alert-content"><div class="alert-device">esp32-001</div><div class="alert-message">temp > 30 (current: 31.4°C) — Resolved after device cooldown</div></div><span class="alert-time">Jul 22, 10:28</span></div>
+  </div>
+</div>
+</body></html>

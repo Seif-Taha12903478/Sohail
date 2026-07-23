@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#0d1117; color:#e0e0e0; padding:30px; }
+.title { font-size:1.25rem; font-weight:600; margin-bottom:20px; color:#06b6d4; }
+.mqtt-client { background:#161b22; border:1px solid #30363d; border-radius:8px; margin-bottom:16px; }
+.client-header { background:#1c2128; padding:12px 16px; border-bottom:1px solid #30363d; border-radius:8px 8px 0 0; display:flex; align-items:center; gap:8px; }
+.client-header h3 { font-size:0.9rem; font-weight:600; }
+.badge { font-size:0.7rem; padding:2px 8px; border-radius:4px; font-weight:500; }
+.badge.pub { background:rgba(59,130,246,0.15); color:#3b82f6; } .badge.sub { background:rgba(16,185,129,0.15); color:#10b981; }
+.messages { padding:12px 16px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; }
+.msg { display:flex; gap:12px; padding:6px 0; border-bottom:1px solid #21262d; } .msg:last-child { border-bottom:none; }
+.msg-time { color:#6e7681; white-space:nowrap; min-width:90px; }
+.msg-dir { font-weight:600; min-width:30px; } .msg-dir.pub { color:#3b82f6; } .msg-dir.sub { color:#10b981; }
+.msg-topic { color:#f0883e; min-width:160px; }
+.msg-payload { color:#c9d1d9; } .msg-payload .key { color:#79c0ff; } .msg-payload .num { color:#f0883e; } .msg-payload .str { color:#7ee787; }
+.stats { display:flex; gap:24px; margin-top:16px; }
+.stat { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:16px 24px; text-align:center; }
+.stat-value { font-size:1.5rem; font-weight:700; } .stat-value.pub { color:#3b82f6; } .stat-value.sub { color:#10b981; }
+.stat-label { font-size:0.75rem; color:#8b949e; margin-top:4px; }
+</style></head><body>
+<div class="title">MQTT Message Monitor — HiveMQ Broker</div>
+<div class="mqtt-client"><div class="client-header"><h3>ESP32 Device (Publisher)</h3><span class="badge pub">PUBLISHING</span><span style="margin-left:auto;color:#6e7681;font-size:0.75rem">broker.hivemq.com:1883</span></div>
+  <div class="messages">
+    <div class="msg"><span class="msg-time">11:13:13.231</span><span class="msg-dir pub">PUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">{"device_id":"<span class="str">esp32-001</span>","temp":<span class="num">24.5</span>,"light":<span class="num">380</span>,"mode":<span class="num">1</span>}</span></div>
+    <div class="msg"><span class="msg-time">11:12:13.231</span><span class="msg-dir pub">PUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">{"device_id":"<span class="str">esp32-001</span>","temp":<span class="num">28.7</span>,"light":<span class="num">361</span>,"mode":<span class="num">1</span>}</span></div>
+    <div class="msg"><span class="msg-time">11:11:13.231</span><span class="msg-dir pub">PUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">{"device_id":"<span class="str">esp32-001</span>","temp":<span class="num">28.4</span>,"light":<span class="num">405</span>,"mode":<span class="num">1</span>}</span></div>
+    <div class="msg"><span class="msg-time">11:10:13.231</span><span class="msg-dir pub">PUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">{"device_id":"<span class="str">esp32-001</span>","temp":<span class="num">35.7</span>,"light":<span class="num">368</span>,"mode":<span class="num">1</span>}</span></div>
+    <div class="msg"><span class="msg-time">11:09:13.231</span><span class="msg-dir pub">PUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">{"device_id":"<span class="str">esp32-001</span>","temp":<span class="num">33.9</span>,"light":<span class="num">479</span>,"mode":<span class="num">1</span>}</span></div>
+  </div>
+</div>
+<div class="mqtt-client"><div class="client-header"><h3>Ingestion API (Subscriber)</h3><span class="badge sub">SUBSCRIBED</span><span style="margin-left:auto;color:#6e7681;font-size:0.75rem">topic: device/telemetry</span></div>
+  <div class="messages">
+    <div class="msg"><span class="msg-time">11:13:13.232</span><span class="msg-dir sub">SUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">✓ Received & stored: device=<span class="str">esp32-001</span> temp=<span class="num">24.5</span>°C light=<span class="num">380</span>lx</span></div>
+    <div class="msg"><span class="msg-time">11:12:13.232</span><span class="msg-dir sub">SUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">✓ Received & stored: device=<span class="str">esp32-001</span> temp=<span class="num">28.7</span>°C light=<span class="num">361</span>lx</span></div>
+    <div class="msg"><span class="msg-time">11:11:13.232</span><span class="msg-dir sub">SUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">✓ Received & stored: device=<span class="str">esp32-001</span> temp=<span class="num">28.4</span>°C light=<span class="num">405</span>lx</span></div>
+    <div class="msg"><span class="msg-time">11:10:13.232</span><span class="msg-dir sub">SUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">✓ Received & stored: device=<span class="str">esp32-001</span> temp=<span class="num">35.7</span>°C light=<span class="num">368</span>lx</span></div>
+    <div class="msg"><span class="msg-time">11:09:13.232</span><span class="msg-dir sub">SUB</span><span class="msg-topic">device/telemetry</span><span class="msg-payload">✓ Received & stored: device=<span class="str">esp32-001</span> temp=<span class="num">33.9</span>°C light=<span class="num">479</span>lx</span></div>
+  </div>
+</div>
+<div class="mqtt-client"><div class="client-header"><h3>Dashboard → Device (Command Channel)</h3><span class="badge pub">PUBLISHING</span><span style="margin-left:auto;color:#6e7681;font-size:0.75rem">topic: device/commands</span></div>
+  <div class="messages">
+    <div class="msg"><span class="msg-time">11:05:00.000</span><span class="msg-dir pub">PUB</span><span class="msg-topic">device/commands</span><span class="msg-payload">{"cmd":"<span class="str">MODE</span>","value":<span class="num">2</span>}</span></div>
+    <div class="msg"><span class="msg-time">11:05:00.050</span><span class="msg-dir sub">SUB</span><span class="msg-topic">device/commands</span><span class="msg-payload">✓ Device acknowledged: MODE=2 (Fast)</span></div>
+  </div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="stat-value pub">274</div><div class="stat-label">Messages Published</div></div>
+  <div class="stat"><div class="stat-value sub">274</div><div class="stat-label">Messages Received</div></div>
+  <div class="stat"><div class="stat-value" style="color:#f0883e">1</div><div class="stat-label">Commands Sent</div></div>
+  <div class="stat"><div class="stat-value" style="color:#3fb950">100%</div><div class="stat-label">Delivery Rate</div></div>
+</div>
+</body></html>

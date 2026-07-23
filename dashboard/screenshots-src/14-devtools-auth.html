@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#1e1e1e;color:#d4d4d4}
+.devtools{display:flex;flex-direction:column;height:100vh}
+.devtools-header{background:#2d2d2d;padding:8px 16px;display:flex;gap:16px;align-items:center;border-bottom:1px solid #1e1e1e}
+.devtools-tab{font-size:0.8rem;color:#858585;padding:6px 12px;border-radius:4px}
+.devtools-tab.active{background:#37373d;color:#06b6d4}
+.devtools-body{display:flex;flex:1;overflow:hidden}
+.network-list{width:420px;background:#252526;border-right:1px solid #1e1e1e;overflow-y:auto}
+.network-header{display:flex;padding:8px 12px;font-size:0.7rem;color:#858585;border-bottom:1px solid #3d3d3d;font-weight:600;text-transform:uppercase}
+.network-row{display:flex;padding:8px 12px;font-size:0.78rem;border-bottom:1px solid #2d2d2d}
+.network-row.active{background:#37373d}
+.network-row .name{flex:1;color:#d4d4d4}.network-row .status{width:40px;text-align:center;color:#10b981}
+.network-row .type{width:60px;color:#858585}.network-row .size{width:60px;color:#858585;text-align:right}
+.network-row .time{width:60px;color:#858585;text-align:right}
+.detail-panel{flex:1;overflow-y:auto;padding:20px}
+.detail-section{margin-bottom:24px}
+.detail-title{font-size:0.75rem;font-weight:600;color:#858585;text-transform:uppercase;margin-bottom:12px}
+.headers-table{width:100%;border-collapse:collapse;font-size:0.8rem;font-family:'JetBrains Mono',monospace}
+.headers-table th{text-align:left;padding:8px 12px;background:#252526;color:#858585;font-weight:600;border-bottom:1px solid #3d3d3d}
+.headers-table td{padding:8px 12px;border-bottom:1px solid #2d2d2d}
+.headers-table td:first-child{color:#9cdcfe;width:35%}.headers-table td:last-child{color:#ce9178;word-break:break-all}
+.headers-table tr.highlight td{background:rgba(6,182,212,0.1)}
+.headers-table tr.highlight td:first-child{color:#06b6d4;font-weight:600}
+.headers-table tr.highlight td:last-child{color:#06b6d4;font-weight:500}
+.auth-code{background:#1e1e1e;border:1px solid #3d3d3d;border-radius:8px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.7}
+.code-line{display:flex}.line-num{color:#6e7681;min-width:28px;text-align:right;padding-right:10px}
+.kw{color:#569cd6}.str{color:#ce9178}.fn{color:#dcdcaa}.var{color:#9cdcfe}.comment{color:#6a9955}.prop{color:#9cdcfe}.num{color:#b5cea8}
+</style></head><body>
+<div class="devtools">
+  <div class="devtools-header"><span class="devtools-tab">Elements</span><span class="devtools-tab">Console</span><span class="devtools-tab">Sources</span><span class="devtools-tab active">Network</span><span class="devtools-tab">Performance</span><span class="devtools-tab">Application</span></div>
+  <div class="devtools-body">
+    <div class="network-list">
+      <div class="network-header"><span class="name">Name</span><span class="status">Status</span><span class="type">Type</span><span class="size">Size</span><span class="time">Time</span></div>
+      <div class="network-row"><span class="name">localhost:3001</span><span class="status">200</span><span class="type">xhr</span><span class="size">1.2 KB</span><span class="time">42ms</span></div>
+      <div class="network-row active"><span class="name">readings?device=esp32-001</span><span class="status">200</span><span class="type">xhr</span><span class="size">1.2 KB</span><span class="time">42ms</span></div>
+      <div class="network-row"><span class="name">devices</span><span class="status">200</span><span class="type">xhr</span><span class="size">256 B</span><span class="time">18ms</span></div>
+      <div class="network-row"><span class="name">alerts?device=esp32-001</span><span class="status">200</span><span class="type">xhr</span><span class="size">890 B</span><span class="time">35ms</span></div>
+      <div class="network-row"><span class="name">stats?device=esp32-001</span><span class="status">200</span><span class="type">xhr</span><span class="size">180 B</span><span class="time">28ms</span></div>
+      <div class="network-row"><span class="name">thresholds?device=esp32-001</span><span class="status">200</span><span class="type">xhr</span><span class="size">420 B</span><span class="time">22ms</span></div>
+      <div class="network-row"><span class="name">command</span><span class="status">200</span><span class="type">xhr</span><span class="size">95 B</span><span class="time">15ms</span></div>
+      <div class="network-row"><span class="name">readings (no token)</span><span class="status" style="color:#ef4444">401</span><span class="type">xhr</span><span class="size">65 B</span><span class="time">12ms</span></div>
+    </div>
+    <div class="detail-panel">
+      <div class="detail-section"><div class="detail-title">Request Headers — readings?device=esp32-001</div>
+        <table class="headers-table"><tr><th>Header</th><th>Value</th></tr>
+          <tr class="highlight"><td>Authorization</td><td>Bearer iot-platform-demo-token</td></tr>
+          <tr><td>Accept</td><td>application/json</td></tr>
+          <tr><td>Content-Type</td><td>application/json</td></tr>
+          <tr><td>Origin</td><td>http://localhost:5173</td></tr>
+          <tr><td>Referer</td><td>http://localhost:5173/</td></tr>
+          <tr><td>User-Agent</td><td>Mozilla/5.0 (X11; Linux x86_64)</td></tr>
+        </table>
+      </div>
+      <div class="detail-section"><div class="detail-title">Response Headers</div>
+        <table class="headers-table"><tr><th>Header</th><th>Value</th></tr>
+          <tr><td>Content-Type</td><td>application/json; charset=utf-8</td></tr>
+          <tr><td>Access-Control-Allow-Origin</td><td>*</td></tr>
+          <tr><td>X-RateLimit-Limit</td><td>100</td></tr>
+          <tr><td>X-RateLimit-Remaining</td><td>94</td></tr>
+          <tr><td>Date</td><td>Thu, 22 Jul 2026 11:15:00 GMT</td></tr>
+        </table>
+      </div>
+      <div class="detail-section"><div class="detail-title">Auth Code Snippet — lib/api.js</div>
+        <div class="auth-code">
+<div class="code-line"><span class="line-num">1</span><span class="comment">// Bearer token auth — attached to every API request</span></div>
+<div class="code-line"><span class="line-num">2</span><span class="kw">export</span> <span class="kw">function</span> <span class="fn">apiGet</span>(<span class="var">path</span>, <span class="var">token</span>) {</div>
+<div class="code-line"><span class="line-num">3</span>  <span class="kw">const</span> <span class="var">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`${config.API_BASE}/${path}`</span>, {</div>
+<div class="code-line"><span class="line-num">4</span>    <span class="prop">headers</span>: {</div>
+<div class="code-line"><span class="line-num">5</span>      <span class="str">'Authorization'</span>: <span class="str">`Bearer ${token}`</span>,</div>
+<div class="code-line"><span class="line-num">6</span>      <span class="str">'Accept'</span>: <span class="str">'application/json'</span></div>
+<div class="code-line"><span class="line-num">7</span>    }</div>
+<div class="code-line"><span class="line-num">8</span>  });</div>
+<div class="code-line"><span class="line-num">9</span>  <span class="kw">if</span> (<span class="var">res</span>.<span class="prop">status</span> === <span class="num">401</span>) <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">ApiError</span>(<span class="str">'Unauthorized'</span>);</div>
+<div class="code-line"><span class="line-num">10</span>  <span class="kw">return</span> <span class="var">res</span>.<span class="fn">json</span>();</div>
+<div class="code-line"><span class="line-num">11</span>}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#1e1e1e; color:#d4d4d4; }
+.ide { display:flex; height:100vh; }
+.sidebar { width:48px; background:#252526; display:flex; flex-direction:column; align-items:center; padding-top:12px; gap:8px; }
+.sidebar-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:1rem; color:#858585; }
+.sidebar-icon.active { background:#37373d; color:#06b6d4; }
+.editor-area { flex:1; display:flex; flex-direction:column; }
+.tabs { display:flex; background:#252526; border-bottom:1px solid #1e1e1e; }
+.tab { padding:8px 16px; font-size:0.8rem; color:#858585; border-right:1px solid #1e1e1e; }
+.tab.active { background:#1e1e1e; color:#d4d4d4; }
+.code-area { flex:1; background:#1e1e1e; padding:16px; overflow:hidden; font-family:'JetBrains Mono',monospace; font-size:0.8rem; line-height:1.6; }
+.line { display:flex; }
+.line-num { color:#6e7681; min-width:30px; text-align:right; padding-right:12px; }
+.kw { color:#569cd6; } .str { color:#ce9178; } .fn { color:#dcdcaa; } .var { color:#9cdcfe; } .num { color:#b5cea8; } .comment { color:#6a9955; } .prop { color:#9cdcfe; }
+.status-bar { background:#007acc; color:white; padding:4px 12px; font-size:0.7rem; display:flex; justify-content:space-between; }
+.schema-panel { width:380px; background:#252526; border-left:1px solid #1e1e1e; padding:16px; overflow-y:auto; }
+.schema-title { font-size:0.85rem; font-weight:600; color:#06b6d4; margin-bottom:16px; }
+.table-card { background:#1e1e1e; border:1px solid #333; border-radius:8px; padding:12px; margin-bottom:12px; }
+.table-name { font-size:0.8rem; font-weight:600; color:#4ec9b0; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.table-name .pk { font-size:0.65rem; background:#f59e0b; color:#1e1e1e; padding:1px 5px; border-radius:3px; }
+.col { display:flex; justify-content:space-between; padding:3px 0; font-size:0.72rem; }
+.col-name { color:#9cdcfe; } .col-type { color:#6e7681; }
+</style></head><body>
+<div class="ide">
+  <div class="sidebar"><div class="sidebar-icon active">📄</div><div class="sidebar-icon">🔍</div><div class="sidebar-icon">🗄️</div><div class="sidebar-icon">🔧</div></div>
+  <div class="editor-area">
+    <div class="tabs"><div class="tab active">index.js</div><div class="tab">sensor_control.h</div><div class="tab">telemetry_comms.h</div></div>
+    <div class="code-area">
+      <div class="line"><span class="line-num">1</span><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>);</div>
+      <div class="line"><span class="line-num">2</span><span class="kw">const</span> <span class="var">mqtt</span> = <span class="fn">require</span>(<span class="str">'mqtt'</span>);</div>
+      <div class="line"><span class="line-num">3</span><span class="kw">const</span> { <span class="fn">createClient</span> } = <span class="fn">require</span>(<span class="str">'@supabase/supabase-js'</span>);</div>
+      <div class="line"><span class="line-num">4</span></div>
+      <div class="line"><span class="line-num">5</span><span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>();</div>
+      <div class="line"><span class="line-num">6</span><span class="var">app</span>.<span class="fn">use</span>(<span class="fn">express</span>.<span class="prop">json</span>());</div>
+      <div class="line"><span class="line-num">7</span><span class="var">app</span>.<span class="fn">use</span>(<span class="fn">require</span>(<span class="str">'cors'</span>)());</div>
+      <div class="line"><span class="line-num">8</span></div>
+      <div class="line"><span class="line-num">9</span><span class="comment">// --- Supabase client ---</span></div>
+      <div class="line"><span class="line-num">10</span><span class="kw">const</span> <span class="var">supabase</span> = <span class="fn">createClient</span>(<span class="var">process</span>.<span class="prop">env</span>.<span class="prop">SUPABASE_URL</span>, <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">SUPABASE_SERVICE_ROLE_KEY</span>);</div>
+      <div class="line"><span class="line-num">11</span></div>
+      <div class="line"><span class="line-num">12</span><span class="comment">// --- Bearer token auth middleware ---</span></div>
+      <div class="line"><span class="line-num">13</span><span class="kw">function</span> <span class="fn">authMiddleware</span>(<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) {</div>
+      <div class="line"><span class="line-num">14</span>  <span class="kw">const</span> <span class="var">auth</span> = <span class="var">req</span>.<span class="prop">headers</span>.<span class="prop">authorization</span>;</div>
+      <div class="line"><span class="line-num">15</span>  <span class="kw">if</span> (!<span class="var">auth</span> || <span class="var">auth</span> !== <span class="str">`Bearer ${process.env.API_TOKEN}`</span>) {</div>
+      <div class="line"><span class="line-num">16</span>    <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">401</span>).<span class="fn">json</span>({ <span class="prop">error</span>: <span class="str">'Unauthorized'</span> });</div>
+      <div class="line"><span class="line-num">17</span>  }</div>
+      <div class="line"><span class="line-num">18</span>  <span class="fn">next</span>();</div>
+      <div class="line"><span class="line-num">19</span>}</div>
+      <div class="line"><span class="line-num">20</span></div>
+      <div class="line"><span class="line-num">21</span><span class="comment">// --- Rate limiter (100 req/min) ---</span></div>
+      <div class="line"><span class="line-num">22</span><span class="kw">const</span> <span class="var">rateLimiter</span> = <span class="fn">require</span>(<span class="str">'express-rate-limit'</span>);</div>
+      <div class="line"><span class="line-num">23</span><span class="var">app</span>.<span class="fn">use</span>(<span class="fn">rateLimiter</span>({ <span class="prop">windowMs</span>: <span class="num">60000</span>, <span class="prop">max</span>: <span class="num">100</span> }));</div>
+      <div class="line"><span class="line-num">24</span></div>
+      <div class="line"><span class="line-num">25</span><span class="comment">// --- MQTT subscriber → stores readings ---</span></div>
+      <div class="line"><span class="line-num">26</span><span class="kw">const</span> <span class="var">client</span> = <span class="var">mqtt</span>.<span class="fn">connect</span>(<span class="str">'mqtt://broker.hivemq.com'</span>);</div>
+      <div class="line"><span class="line-num">27</span><span class="var">client</span>.<span class="fn">on</span>(<span class="str">'message'</span>, <span class="kw">async</span> (<span class="var">topic</span>, <span class="var">payload</span>) => {</div>
+      <div class="line"><span class="line-num">28</span>  <span class="kw">const</span> <span class="var">reading</span> = <span class="fn">JSON</span>.<span class="fn">parse</span>(<span class="var">payload</span>.<span class="fn">toString</span>());</div>
+      <div class="line"><span class="line-num">29</span>  <span class="kw">await</span> <span class="var">supabase</span>.<span class="fn">from</span>(<span class="str">'readings'</span>).<span class="fn">insert</span>({ ...<span class="var">reading</span>, <span class="prop">ts</span>: <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toISOString</span>() });</div>
+      <div class="line"><span class="line-num">30</span>  <span class="fn">evaluateThresholds</span>(<span class="var">reading</span>); <span class="comment">// → alert engine</span></div>
+      <div class="line"><span class="line-num">31</span>});</div>
+      <div class="line"><span class="line-num">32</span></div>
+      <div class="line"><span class="line-num">33</span><span class="comment">// --- GET /readings (secured) ---</span></div>
+      <div class="line"><span class="line-num">34</span><span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/readings'</span>, <span class="var">authMiddleware</span>, <span class="kw">async</span> (<span class="var">req</span>, <span class="var">res</span>) => {</div>
+      <div class="line"><span class="line-num">35</span>  <span class="kw">const</span> { <span class="prop">device</span>, <span class="prop">from</span>, <span class="prop">to</span> } = <span class="var">req</span>.<span class="prop">query</span>;</div>
+      <div class="line"><span class="line-num">36</span>  <span class="kw">let</span> <span class="var">query</span> = <span class="var">supabase</span>.<span class="fn">from</span>(<span class="str">'readings'</span>).<span class="fn">select</span>(<span class="str">'*'</span>).<span class="fn">eq</span>(<span class="str">'device_id'</span>, <span class="var">device</span>);</div>
+      <div class="line"><span class="line-num">37</span>  <span class="kw">if</span> (<span class="var">from</span>) <span class="var">query</span> = <span class="var">query</span>.<span class="fn">gte</span>(<span class="str">'ts'</span>, <span class="var">from</span>);</div>
+      <div class="line"><span class="line-num">38</span>  <span class="kw">if</span> (<span class="var">to</span>) <span class="var">query</span> = <span class="var">query</span>.<span class="fn">lte</span>(<span class="str">'ts'</span>, <span class="var">to</span>);</div>
+      <div class="line"><span class="line-num">39</span>  <span class="kw">const</span> { <span class="prop">data</span> } = <span class="kw">await</span> <span class="var">query</span>.<span class="fn">order</span>(<span class="str">'ts'</span>, { <span class="prop">ascending</span>: <span class="kw">false</span> }).<span class="fn">limit</span>(<span class="num">1000</span>);</div>
+      <div class="line"><span class="line-num">40</span>  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">data</span>);</div>
+      <div class="line"><span class="line-num">41</span>});</div>
+    </div>
+    <div class="status-bar"><span>main · index.js · Ln 41, Col 3</span><span>UTF-8 · JavaScript · Spaces: 2</span></div>
+  </div>
+  <div class="schema-panel">
+    <div class="schema-title">Supabase Schema — 4 Tables</div>
+    <div class="table-card"><div class="table-name">📦 devices <span class="pk">PK</span></div>
+      <div class="col"><span class="col-name">device_id</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">name</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">location</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">created_at</span><span class="col-type">timestamptz</span></div>
+    </div>
+    <div class="table-card"><div class="table-name">📊 readings <span class="pk">PK</span></div>
+      <div class="col"><span class="col-name">id</span><span class="col-type">uuid</span></div>
+      <div class="col"><span class="col-name">device_id</span><span class="col-type">text · FK</span></div>
+      <div class="col"><span class="col-name">temp</span><span class="col-type">real</span></div>
+      <div class="col"><span class="col-name">light</span><span class="col-type">int</span></div>
+      <div class="col"><span class="col-name">mode</span><span class="col-type">int</span></div>
+      <div class="col"><span class="col-name">ts</span><span class="col-type">timestamptz</span></div>
+    </div>
+    <div class="table-card"><div class="table-name">🚨 alerts <span class="pk">PK</span></div>
+      <div class="col"><span class="col-name">id</span><span class="col-type">uuid</span></div>
+      <div class="col"><span class="col-name">device_id</span><span class="col-type">text · FK</span></div>
+      <div class="col"><span class="col-name">field</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">operator</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">value</span><span class="col-type">real</span></div>
+      <div class="col"><span class="col-name">severity</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">status</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">acknowledged_at</span><span class="col-type">timestamptz</span></div>
+      <div class="col"><span class="col-name">resolved_at</span><span class="col-type">timestamptz</span></div>
+    </div>
+    <div class="table-card"><div class="table-name">⚙️ thresholds <span class="pk">PK</span></div>
+      <div class="col"><span class="col-name">id</span><span class="col-type">uuid</span></div>
+      <div class="col"><span class="col-name">device_id</span><span class="col-type">text · FK</span></div>
+      <div class="col"><span class="col-name">field</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">operator</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">value</span><span class="col-type">real</span></div>
+      <div class="col"><span class="col-name">severity</span><span class="col-type">text</span></div>
+      <div class="col"><span class="col-name">enabled</span><span class="col-type">bool</span></div>
+    </div>
+  </div>
+</div>
+</body></html>

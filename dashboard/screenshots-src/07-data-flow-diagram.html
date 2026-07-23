@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#0f172a; color:#f1f5f9; padding:40px; }
+.title { font-size:1.5rem; font-weight:700; margin-bottom:24px; color:#06b6d4; }
+.diagram { display:flex; flex-direction:column; align-items:center; gap:0; }
+.box { border:2px solid; border-radius:12px; padding:20px 28px; text-align:center; min-width:200px; background:#1e293b; }
+.box.device { border-color:#10b981; } .box.broker { border-color:#f59e0b; }
+.box.api { border-color:#06b6d4; } .box.db { border-color:#8b5cf6; } .box.dash { border-color:#3b82f6; }
+.box h3 { font-size:1rem; font-weight:600; margin-bottom:6px; }
+.box p { font-size:0.75rem; color:#94a3b8; }
+.box .icon { font-size:1.5rem; margin-bottom:8px; }
+.arrow { display:flex; flex-direction:column; align-items:center; padding:8px 0; }
+.arrow-line { width:2px; height:24px; background:#475569; }
+.arrow-label { font-size:0.7rem; color:#64748b; margin-top:4px; }
+.arrow-down::after { content:'▼'; color:#475569; font-size:0.8rem; }
+.legend { margin-top:32px; display:flex; gap:24px; justify-content:center; }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:0.75rem; color:#94a3b8; }
+.legend-dot { width:12px; height:12px; border-radius:3px; }
+</style></head><body>
+<div class="title">IoT Data Flow: ESP32 → Web Dashboard</div>
+<div class="diagram">
+  <div class="box device"><div class="icon">📡</div><h3>ESP32 + DHT22</h3><p>Temperature & Light Sensors</p><p style="margin-top:4px;color:#10b981">Wokwi Simulation</p></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-label">Wi-Fi (802.11)</div></div><div class="arrow-down"></div>
+  <div class="box broker"><div class="icon">🔄</div><h3>MQTT Broker</h3><p>HiveMQ Public Broker</p><p style="margin-top:4px;color:#f59e0b">broker.hivemq.com:1883</p></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-label">MQTT Subscribe (device/telemetry)</div></div><div class="arrow-down"></div>
+  <div class="box api"><div class="icon">⚙️</div><h3>Ingestion API</h3><p>Node.js + Express</p><p style="margin-top:4px;color:#06b6d4">Port 3001</p></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-label">SQL (parameterized queries)</div></div><div class="arrow-down"></div>
+  <div class="box db"><div class="icon">🗄️</div><h3>Supabase PostgreSQL</h3><p>devices · readings · alerts · thresholds</p><p style="margin-top:4px;color:#8b5cf6">Row Level Security enabled</p></div>
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-label">Secured REST API (Bearer Token Auth)</div></div><div class="arrow-down"></div>
+  <div class="box dash"><div class="icon">📊</div><h3>Web Dashboard</h3><p>React + Vite + Recharts</p><p style="margin-top:4px;color:#3b82f6">Live · History · Alerts · Control</p></div>
+</div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Firmware</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Messaging</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>API Layer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Database</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Presentation</div>
+</div>
+</body></html>

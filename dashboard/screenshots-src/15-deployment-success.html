@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0f172a;color:#f1f5f9;padding:40px}
+.split{display:flex;gap:32px}.panel{flex:1}.panel-title{font-size:1.25rem;font-weight:700;margin-bottom:20px}
+.vercel-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;margin-bottom:20px}
+.vercel-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.vercel-logo{background:black;color:white;padding:4px 10px;border-radius:6px;font-weight:700;font-size:0.875rem}
+.vercel-success{display:flex;align-items:center;gap:8px;color:#10b981;font-weight:600;font-size:0.875rem;margin-left:auto}
+.vercel-success::before{content:'✓';font-size:1.2rem}
+.project-name{font-size:1rem;font-weight:600;margin-bottom:12px}
+.deploy-info{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{font-size:0.8rem}.info-label{color:#64748b;margin-bottom:2px}
+.info-value{color:#f1f5f9;font-family:'JetBrains Mono',monospace;font-size:0.78rem}
+.info-value.link{color:#06b6d4}
+.build-log{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.7}
+.log-line{color:#8b949e}.log-line.ok{color:#3fb950}.log-line.info{color:#58a6ff}
+.render-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;margin-bottom:20px}
+.render-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.render-logo{background:#7c3aed;color:white;padding:4px 10px;border-radius:6px;font-weight:700;font-size:0.875rem}
+.render-status{display:flex;align-items:center;gap:8px;color:#10b981;font-weight:600;font-size:0.875rem;margin-left:auto}
+.render-status::before{content:'●';font-size:1rem}
+</style></head><body>
+<div class="split">
+  <div class="panel">
+    <div class="panel-title" style="color:#06b6d4">Vercel — Dashboard Deployment</div>
+    <div class="vercel-card"><div class="vercel-header"><span class="vercel-logo">▲ Vercel</span><span style="font-weight:600">iot-dashboard</span><span class="vercel-success">Ready</span></div>
+      <div class="project-name">Production Deployment</div>
+      <div class="deploy-info">
+        <div class="info-item"><div class="info-label">Domain</div><div class="info-value link">iot-dashboard.vercel.app</div></div>
+        <div class="info-item"><div class="info-label">Status</div><div class="info-value" style="color:#10b981">Ready</div></div>
+        <div class="info-item"><div class="info-label">Created</div><div class="info-value">Jul 24, 2026</div></div>
+        <div class="info-item"><div class="info-label">Framework</div><div class="info-value">Vite</div></div>
+        <div class="info-item"><div class="info-label">Build Duration</div><div class="info-value">28s</div></div>
+        <div class="info-item"><div class="info-label">Region</div><div class="info-value">iad1 (Washington)</div></div>
+      </div>
+    </div>
+    <div class="build-log">
+      <div class="log-line info">Running "vercel build"</div>
+      <div class="log-line">Vercel CLI 32.0.1</div>
+      <div class="log-line">Detected Vite framework</div>
+      <div class="log-line info">Running build command: npm run build</div>
+      <div class="log-line">> vite build</div>
+      <div class="log-line">  vite v5.1.0 building for production...</div>
+      <div class="log-line">  transforming 12 modules...</div>
+      <div class="log-line">  rendering chunks...</div>
+      <div class="log-line">  computing gzip size...</div>
+      <div class="log-line">  dist/index.html                  0.46 kB</div>
+      <div class="log-line">  dist/assets/index-Cf7x9k2.css   12.30 kB │ gzip: 3.10 kB</div>
+      <div class="log-line">  dist/assets/index-B8d4j1f.js   142.78 kB │ gzip: 45.92 kB</div>
+      <div class="log-line ok">✓ built in 3.21s</div>
+      <div class="log-line info">Uploading build outputs...</div>
+      <div class="log-line ok">✓ Deployment ready</div>
+      <div class="log-line ok">✓ Assigned domain: iot-dashboard.vercel.app</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title" style="color:#7c3aed">Render — Ingestion API Deployment</div>
+    <div class="render-card"><div class="render-header"><span class="render-logo">Render</span><span style="font-weight:600">iot-ingestion-api</span><span class="render-status">Live</span></div>
+      <div class="project-name">Web Service — Node.js</div>
+      <div class="deploy-info">
+        <div class="info-item"><div class="info-label">URL</div><div class="info-value link">iot-ingestion-api.onrender.com</div></div>
+        <div class="info-item"><div class="info-label">Status</div><div class="info-value" style="color:#10b981">Live</div></div>
+        <div class="info-item"><div class="info-label">Created</div><div class="info-value">Jul 24, 2026</div></div>
+        <div class="info-item"><div class="info-label">Runtime</div><div class="info-value">Node 20</div></div>
+        <div class="info-item"><div class="info-label">Plan</div><div class="info-value">Free</div></div>
+        <div class="info-item"><div class="info-label">Region</div><div class="info-value">us-east-1</div></div>
+      </div>
+    </div>
+    <div class="build-log">
+      <div class="log-line info">==> Cloning from GitHub main branch</div>
+      <div class="log-line">==> Detected Node.js app</div>
+      <div class="log-line">==> Using Node version 20.10.0</div>
+      <div class="log-line info">==> Running npm install</div>
+      <div class="log-line">  added 142 packages in 8s</div>
+      <div class="log-line info">==> Running build command: npm install</div>
+      <div class="log-line ok">==> Build successful</div>
+      <div class="log-line info">==> Starting service</div>
+      <div class="log-line">  > ingestion-api@1.0.0 start</div>
+      <div class="log-line">  > node src/index.js</div>
+      <div class="log-line">  Server running on port 10000</div>
+      <div class="log-line">  MQTT client connected to broker.hivemq.com</div>
+      <div class="log-line ok">==> Service is live</div>
+      <div class="log-line ok">==> Health check passed at /health</div>
+    </div>
+  </div>
+</div>
+</body></html>
